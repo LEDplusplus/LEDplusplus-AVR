@@ -19,7 +19,7 @@
 #include "Light_WS2812/light_ws2812.h"
 
 // LED cRGB array ws2812 library reads periodically from
-volatile struct cRGB leds[LENGTH];
+struct cRGB leds[LENGTH];
 
 // gamma corrected warm white light (64 steps)
 const uint8_t blind_r[64] PROGMEM = { 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44,
@@ -37,6 +37,12 @@ const uint8_t blind_b[64] PROGMEM = { 0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5,
 		21, 21, 21, 22, 22, 23, 23, 23, 24, 24, 25, 25 };
 
 
+// variable delay
+void delay_ms(int milliseconds) {
+	while(--milliseconds){
+		_delay_us(1000);
+	}
+}
 void doSingleColor(uint8_t r, uint8_t g, uint8_t b) {
 	for (uint8_t i = 0; i < LENGTH; i++) {
 		leds[i].r = r;
@@ -46,13 +52,24 @@ void doSingleColor(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 
-void doColorRotation(int rotation) {
+// blink adjustable duty cycle
+void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g, uint8_t b, float dutycycle) {
+	if ((counter % periode) == 0) {
+		doSingleColor(0, 0, 0);
+	}
+	else if ((counter % periode) == (uint16_t)(dutycycle*periode)) {
+		doSingleColor(r, g, b);
+	}
+}
+
+
+void doColorRotation(uint16_t rotation) {
 	// Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
 	uint8_t r, g, b;
 	uint8_t section, section_rotation;
-	uint16_t p, q, t;
-	section = rotation / 43;
-	section_rotation = rotation % 43;
+	uint16_t q, t;
+	section = (rotation % 360) / 43;
+	section_rotation = (rotation % 360) % 43;
 	// p = 0;
 	q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
 	t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
@@ -97,13 +114,31 @@ void doColorRotation(int rotation) {
 }
 
 int main(void) {
+
+	_delay_ms(5000);
+
 	DDRD = (1 << PD7); // PD7 (ws2812 data out) as output
 	// led (arduino pin 13 / PB5) for debugging
 	DDRB = (1 << PB5); // PB5 as output
-	PORTB = (1 << PB5); // PB5 on
+	 PORTB = (1 << PB5); // PB5 on
 
-	while(1) {
+	uint16_t counter = 0;
 
+	doSingleColor(255, 0, 0);
+	ws2812_setleds(leds, LENGTH);
+	_delay_ms(1000);
+	doSingleColor(0, 255, 0);
+	ws2812_setleds(leds, LENGTH);
+	_delay_ms(1000);
+	doSingleColor(0, 0, 255);
+	ws2812_setleds(leds, LENGTH);
+	_delay_ms(1000);
+
+	 while(1) {
+		counter++;
+		_delay_us(800);
+		//doColorRotation(counter);
+		doBlink(counter, 300, 255, 255, 0, 0.2);
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
