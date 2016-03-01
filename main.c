@@ -118,6 +118,28 @@ void doSlowFade (uint16_t stepsPerSecond, uint8_t r, uint8_t g, uint8_t b, uint8
 	delay_ms((int)1000/stepsPerSecond);
 }
 
+// do strobe with maximal and minimal period time in ms
+// and predefined or random (0, 0, 0) color
+void doStrobe (int min_time, int max_time, int r, int g, int b) {
+	// random time on
+	int on = (rand() % (max_time - min_time)) + min_time;
+	// random time off
+	int off = (rand() % (max_time - min_time)) + min_time;
+	// random rgb, if not defined
+	if ((r==0) && (g==0) && (b==0)) {
+		r = (rand() % 255);
+		g = (rand() % 255);
+		b = (rand() % 255);
+	}
+	doSingleColor(r, g, b);
+	ws2812_setleds(leds, LENGTH);
+	delay_ms(on);
+	doSingleColor(0, 0, 0);
+	ws2812_setleds(leds, LENGTH);
+	delay_ms(off);
+
+}
+
 
 int main(void) {
 
@@ -156,7 +178,9 @@ int main(void) {
 		//	hardness++;
 		//}
 		// Refresh LED strip every loop
-		ws2812_setleds(leds, LENGTH);
+		// ws2812_setleds(leds, LENGTH);
+		/////////////////////////
+		doStrobe(100, 300, 0, 0, 0);
 		// toggle led for debugging
 		PORTB ^= (1 << PB5);
 	}
