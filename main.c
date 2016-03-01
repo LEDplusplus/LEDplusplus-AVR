@@ -113,9 +113,15 @@ void doColorRotation(uint16_t rotation) {
 	}
 }
 
+void doSlowFade (uint16_t stepsPerSecond, uint8_t r, uint8_t g, uint8_t b, uint8_t hardness) {
+	doSingleColor(r/100*hardness, g/100*hardness, b/100*hardness);
+	delay_ms((int)1000/stepsPerSecond);
+}
+
+
 int main(void) {
 
-	_delay_ms(5000);
+	_delay_ms(1000);
 
 	DDRD = (1 << PD7); // PD7 (ws2812 data out) as output
 	// led (arduino pin 13 / PB5) for debugging
@@ -124,6 +130,7 @@ int main(void) {
 
 	uint16_t counter = 0;
 
+	// 1 second R - G - B as 'start signal'
 	doSingleColor(255, 0, 0);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
@@ -134,11 +141,20 @@ int main(void) {
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
+	// uint8_t hardness = 0;
+
 	 while(1) {
 		counter++;
-		_delay_us(800);
+		//_delay_us(800);
+		//////////////////////
 		//doColorRotation(counter);
-		doBlink(counter, 300, 255, 255, 0, 0.2);
+		//////////////////////
+		//doBlink(counter, 900, 0, 0, 150, 0.5);
+		/////////////////////
+		//doSlowFade(5, 255, 255, 255, hardness);
+		//if (hardness < 100) {
+		//	hardness++;
+		//}
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
