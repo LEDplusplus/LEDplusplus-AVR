@@ -36,7 +36,6 @@ const uint8_t blind_b[64] PROGMEM = { 0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5,
 		14, 14, 14, 15, 15, 16, 16, 16, 17, 17, 18, 18, 18, 19, 19, 20, 20, 20,
 		21, 21, 21, 22, 22, 23, 23, 23, 24, 24, 25, 25 };
 
-
 // variable delay
 void delay_ms(int milliseconds) {
 	while(--milliseconds){
@@ -51,17 +50,15 @@ void doSingleColor(uint8_t r, uint8_t g, uint8_t b) {
 	}
 }
 
-
 // blink adjustable duty cycle
-void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g, uint8_t b, float dutycycle) {
+void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g,
+		uint8_t b, float dutycycle) {
 	if ((counter % periode) == 0) {
 		doSingleColor(0, 0, 0);
-	}
-	else if ((counter % periode) == (uint16_t)(dutycycle*periode)) {
+	} else if ((counter % periode) == (uint16_t) (dutycycle * periode)) {
 		doSingleColor(r, g, b);
 	}
 }
-
 
 void doColorRotation(uint16_t rotation) {
 	// Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
@@ -113,17 +110,56 @@ void doColorRotation(uint16_t rotation) {
 	}
 }
 
-int main(void) {
+void doSlowFade(uint16_t stepsPerSecond, uint8_t r, uint8_t g, uint8_t b,
+		uint8_t hardness) {
+	doSingleColor(r / 100 * hardness, g / 100 * hardness, b / 100 * hardness);
+	delay_ms((int) 1000 / stepsPerSecond);
+}
 
-	_delay_ms(5000);
+/*Strobe with maximal and minimal period time in ms
+ and predefined or random (0, 0, 0) color.
+ For periodical strobe set min_time = max_time.
+ Returns time in ms until doStrobe wants to be called next time. */
+int doStrobe(int min_time, int max_time, int r, int g, int b) {
+	// time until next function call
+	int next_call;
+	// 0 = off, 1 = on
+	static int on_off = 0;
+	if (on_off == 0) {
+		// random rgb, if not defined
+		if ((r == 0) && (g == 0) && (b == 0)) {
+			r = (rand() % 255);
+			g = (rand() % 255);
+			b = (rand() % 255);
+		}
+		doSingleColor(r, g, b);
+		on_off = 1;
+	} else {
+		doSingleColor(0, 0, 0);
+		on_off = 0;
+	}
+	// if time should not be periodic -> random time on / off
+	if (min_time != max_time) {
+		next_call = (rand() % (max_time - min_time)) + min_time;
+	} else {
+		next_call = min_time;
+	}
+	return next_call;
+}
+
+int main(void) {
+	int doStrobe_next_call = 0;
+
+	_delay_ms(1000);
 
 	DDRD = (1 << PD7); // PD7 (ws2812 data out) as output
 	// led (arduino pin 13 / PB5) for debugging
 	DDRB = (1 << PB5); // PB5 as output
-	 PORTB = (1 << PB5); // PB5 on
+	PORTB = (1 << PB5); // PB5 on
 
 	uint16_t counter = 0;
 
+	// 1 second R - G - B as 'start signal'
 	doSingleColor(255, 0, 0);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
@@ -134,14 +170,30 @@ int main(void) {
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
-	 while(1) {
-		counter++;
+	// uint8_t hardness = 0;
+
+	while (1) {
+		// delay 800 µs -> loop needs ~1ms per iteration
 		_delay_us(800);
+		//////////////////////
 		//doColorRotation(counter);
-		doBlink(counter, 300, 255, 255, 0, 0.2);
+		//////////////////////
+		//doBlink(counter, 900, 0, 0, 150, 0.5);
+		/////////////////////
+		//doSlowFade(5, 255, 255, 255, hardness);
+		//if (hardness < 100) {
+		//	hardness++;
+		//}
+		/////////////////////////
+		// only call doStrobe, if counter is equal to the time,
+		// the function wants to be called again
+		if (counter == doStrobe_next_call) {
+			doStrobe_next_call = doStrobe(100, 300, 0, 0, 0) + counter;
+		}
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
 		PORTB ^= (1 << PB5);
+		counter++;
 	}
 }
