@@ -9,6 +9,10 @@
 * License: GNU GPL v2 (see License.txt)
 */
 
+#ifndef F_CPU
+ #define F_CPU 16000000UL
+#endif
+
 #include "light_ws2812.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>

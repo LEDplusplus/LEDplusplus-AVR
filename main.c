@@ -9,6 +9,10 @@
 #define LENGTH 30
 #endif
 
+#ifndef F_CPU
+ #define F_CPU 16000000UL
+#endif
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -16,7 +20,7 @@
 #include <stdlib.h>
 
 #include "ws2812_config.h" // override config in submodule
-#include "Light_WS2812/light_ws2812.h"
+#include "light_ws2812.h"
 
 // LED cRGB array ws2812 library reads periodically from
 struct cRGB leds[LENGTH];
@@ -101,6 +105,11 @@ void doColorRotation(uint16_t rotation) {
 		g = 0;
 		b = q;
 		break;
+	default:
+		r = 0;
+		g = 0;
+		b = 0;
+		break;
 	}
 
 	for (uint8_t i = 0; i < LENGTH; i++) {
@@ -148,7 +157,7 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 }
 
 int main(void) {
-	int doStrobe_next_call = 0;
+	uint16_t doStrobe_next_call = 0;
 
 	_delay_ms(1000);
 
