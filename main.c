@@ -21,6 +21,7 @@
 
 #include "ws2812_config.h" // override config in submodule
 #include "light_ws2812.h"
+#include "uart.h"
 
 // LED cRGB array ws2812 library reads periodically from
 struct cRGB leds[LENGTH];
@@ -157,6 +158,8 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 }
 
 int main(void) {
+	// initialize UART
+	uart_init();
 	uint16_t doStrobe_next_call = 0;
 
 	_delay_ms(1000);
@@ -182,6 +185,20 @@ int main(void) {
 	// uint8_t hardness = 0;
 
 	while (1) {
+		// handle UART command
+		if (uart_rcv_complete == 1) {
+			switch(command[0]) {
+				case 'r':
+					doSingleColor(255, 0, 0);
+					break;
+				case 'g':
+					doSingleColor(0, 255, 0);
+					break;
+				case 'b':
+					doSingleColor(0, 0, 255);
+					break;
+			}
+		}
 		// delay 800 µs -> loop needs ~1ms per iteration
 		_delay_us(800);
 		//////////////////////
@@ -196,9 +213,9 @@ int main(void) {
 		/////////////////////////
 		// only call doStrobe, if counter is equal to the time,
 		// the function wants to be called again
-		if (counter == doStrobe_next_call) {
-			doStrobe_next_call = doStrobe(100, 300, 0, 0, 0) + counter;
-		}
+		//if (counter == doStrobe_next_call) {
+		//	doStrobe_next_call = doStrobe(100, 300, 0, 0, 0) + counter;
+		//}
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
