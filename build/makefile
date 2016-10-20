@@ -1,6 +1,6 @@
 TARGET=main
 MCU=atmega328p
-SOURCES=main.c light_ws2812.c
+SOURCES=main.c light_ws2812.c uart.c
 
 PROGRAMMER=arduino
 #auskommentieren für automatische Wahl
