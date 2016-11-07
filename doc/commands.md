@@ -2,13 +2,15 @@
 
 ## Warning
 
-This documentation describes the developing purpose, not the cuzrrent status, so some functions may not be implemented yet.
+This documentation describes the developing purpose, not the current status, so some functions may not be implemented yet.
 
 ## Command structure
 
 | Startbyte |  commmand   |    parameters        |  Endbyte   |
 |-----------|-------------|----------------------|------------|
-| char: 'S' | char: a-z   | byte / int / float   | char: 'E'  |
+| char: 'S' | char: a-z   |      int / float     | char: 'E'  |
+
+Everything is ASCII coded, all values are seperated by whitespaces.
 
 
 ## commands for entire LED Array
@@ -19,7 +21,7 @@ All LEDs have the same color
 
 command: 'a'
 
-values: byte r, byte g, byte b
+values:  r, g, b
 
 example: `a 255 255 255` for white color
 
@@ -31,9 +33,9 @@ All LEDs have the same color, blinking with periodical with an off-time
 
 command: 'b'
 
-values: byte r, byte g, byte g, byte b, byte periode, float off-time (0-1)
+values: r, g, g, b, periode length in ms, off-time in percent (0-100)
 
-example: `b 255 0 0 20 0.5` for blinking in red color periodical every 20 time units with 50% off-time
+example: `b 255 000 000 02000 050` for blinking in red color periodical every 2000 ms with 50% off-time
 
 
 
@@ -43,21 +45,33 @@ All LEDs have the same color, rotationg periodical trough color space
 
 command: 'c'
 
-values: byte speed
+values: periode length
 
-example: `c 50` for one rotation through color space in 50 time units
+example: `c 050` for one rotation through color space in 5s
 
 
 
-### Slow fade
+### Fade on
 
 Fades all LEDs slowly from off to the same color
 
 command: 'd'
 
-values: byte r, byte g, byte b, byte seconds
+values: r, g, b, seconds / 10
 
-example: `0 255 0 5` fades to red color in 5 seconds
+example: `d 000 255 000 050` fades to red color in 5 seconds
+
+
+
+### Fade off
+
+Fades all LEDs off
+
+command: 'e'
+
+values: time in ms
+
+example: `d 000 255 000 05000` fades to red color in 5 seconds
 
 
 
@@ -65,13 +79,14 @@ example: `0 255 0 5` fades to red color in 5 seconds
 
 Strobes with random or predefined color and random period between min and max time in ms
 
-command: 'e'
+command: 'f'
 
-values: byte r, byte g, byte b, int min time, int max time
+values: r, g, b, int min time, int max time
 
-example 1: `0 0 0 200 1200` strobe with random color and period between 200ms and 1200ms
+example 1: `e 000 000 000 200 1200` strobe with random color and period between 200ms and 1200ms
 
-example 2: `200 0  0 500 500` strobe with red color and period of 500ms 
+example 2: `e 200 000 000 500 500` strobe with red color and period of 500ms 
+
 
 
 
@@ -83,9 +98,9 @@ Set the color of single LEDs
 
 command: 'n'
 
-values: byte r, byte g, byte b, byte position (0 based)
+values: r, g, b, position (0 based)
 
-example: `255 255 255 10` switches the 11th LED on (white)
+example: `n 255 255 255 010` switches the 11th LED on (white)
 
 
 
@@ -95,6 +110,6 @@ Periodical chaser light with background color
 
 command: 'o'
 
-values: byte r, byte g, byte b, byte r, byte g, byte g, byte numer chasing leds, float period in s
+values: r, g, b, r, g, g, number of chasing leds, float period in s
 
-example: `255 0 0 0 255 0 5 3.0` 5 red chasing Light LEDs on green background, need 3 seconds for run-through
+example: `o 255 000 000 000 255 000 005 3.0` 5 red chasing Light LEDs on green background, need 3 seconds for run-through
