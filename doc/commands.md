@@ -108,6 +108,22 @@ example 2: `f 200 000 000 00500 00500` strobe with red color and period of 500ms
 
 
 
+### Strobe with Duty Cycle
+
+Strobes with random or predefined color, defined period and duty cycle (on-time) in ms
+
+command: 'g'
+
+| Parameters | r    | g    | b    | period / ms | on-time / ms |
+|------------|------|------|------|-------------|--------------|
+| Type       | int8 | int8 | int8 | int16       | int16        |
+
+* Zero in r, g and b activates random color mode.
+* Period must be greater than on-time.
+
+example: `g 000 000 255 00500 00250` blue strobe with 2Hz (500ms) and 50% duty cycle (= 250ms on-time)
+
+
 
 ## commands for single LEDs
 
