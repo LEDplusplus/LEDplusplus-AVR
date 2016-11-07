@@ -1,6 +1,6 @@
 # Documentation for LEDpp-AVR
 
-## Warning
+#### Warning
 
 This documentation describes the developing purpose, not the current status, so some functions may not be implemented yet.
 
@@ -8,9 +8,14 @@ This documentation describes the developing purpose, not the current status, so 
 
 | Startbyte |  commmand   |    parameters        |  Endbyte   |
 |-----------|-------------|----------------------|------------|
-| char: 'S' | char: a-z   |      int / float     | char: 'E'  |
+| char: 'S' | char: a-z   |    int8 / int16      | char: 'E'  |
 
-Everything is ASCII coded, all values are seperated by whitespaces.
+Every parameter is ASCII coded (decimal) and seperated by whitespaces.
+
+Parameters have fixed length depending on type and must be zero-filled:
+
+* int8: unsigned, 3 decimal places, maximum: 255
+* int16: unsigned, 5 decimal places, maximum: 65535
 
 
 ## commands for entire LED Array
@@ -21,7 +26,9 @@ All LEDs have the same color
 
 command: 'a'
 
-values:  r, g, b
+| Parameters | r    | g    | b    |
+|------------|------|------|------|
+| Type       | int8 | int8 | int8 |
 
 example: `a 255 255 255` for white color
 
@@ -33,7 +40,9 @@ All LEDs have the same color, blinking with periodical with an off-time
 
 command: 'b'
 
-values: r, g, g, b, periode length in ms, off-time in percent (0-100)
+| Parameters | r    | g    | b    | period length / ms | off-time / % |
+|------------|------|------|------|--------------------|--------------|
+| Type       | int8 | int8 | int8 | int16              | int8         |
 
 example: `b 255 000 000 02000 050` for blinking in red color periodical every 2000 ms with 50% off-time
 
@@ -45,7 +54,9 @@ All LEDs have the same color, rotationg periodical trough color space
 
 command: 'c'
 
-values: periode length
+| Parameters | period length |
+|------------|---------------|
+| Type       | int8          |
 
 example: `c 050` for one rotation through color space in 5s
 
@@ -57,9 +68,11 @@ Fades all LEDs slowly from off to the same color
 
 command: 'd'
 
-values: r, g, b, seconds / 10
+| Parameters | r    | g    | b    | fade duration / ms |
+|------------|------|------|------|--------------------|
+| Type       | int8 | int8 | int8 | int16              |
 
-example: `d 000 255 000 050` fades to red color in 5 seconds
+example: `d 000 255 000 05000` fades to red color in 5 seconds
 
 
 
@@ -69,9 +82,11 @@ Fades all LEDs off
 
 command: 'e'
 
-values: time in ms
+| Parameters | fade duration / ms |
+|------------|--------------------|
+| Type       | int16              |
 
-example: `d 000 255 000 05000` fades to red color in 5 seconds
+example: `e 05000` fades to red color in 5 seconds
 
 
 
@@ -81,11 +96,15 @@ Strobes with random or predefined color and random period between min and max ti
 
 command: 'f'
 
-values: r, g, b, int min time, int max time
+| Parameters | r    | g    | b    | min period / ms | max period / ms |
+|------------|------|------|------|-----------------|-----------------|
+| Type       | int8 | int8 | int8 | int16           | int16           |
 
-example 1: `e 000 000 000 200 1200` strobe with random color and period between 200ms and 1200ms
+Zero in r, g and b activates random color mode.
 
-example 2: `e 200 000 000 500 500` strobe with red color and period of 500ms 
+example 1: `f 000 000 000 00200 01200` strobe with random color and period between 200ms and 1200ms
+
+example 2: `f 200 000 000 00500 00500` strobe with red color and period of 500ms
 
 
 
@@ -98,7 +117,9 @@ Set the color of single LEDs
 
 command: 'n'
 
-values: r, g, b, position (0 based)
+| Parameters | r    | g    | b    | position (zero based) |
+|------------|------|------|------|-----------------------|
+| Type       | int8 | int8 | int8 | int8                  |
 
 example: `n 255 255 255 010` switches the 11th LED on (white)
 
@@ -110,6 +131,10 @@ Periodical chaser light with background color
 
 command: 'o'
 
-values: r, g, b, r, g, g, number of chasing leds, float period in s
+| Parameters | r    | g    | b    | r (BG) | g (BG) | b (BG) | number of chasing leds | float period / ms |
+|------------|------|------|------|--------|--------|--------|------------------------|-------------------|
+| Type       | int8 | int8 | int8 | int8   | int8   | int8   | int8                   | int16             |
 
-example: `o 255 000 000 000 255 000 005 3.0` 5 red chasing Light LEDs on green background, need 3 seconds for run-through
+BG: Background
+
+example: `o 255 000 000 000 255 000 005 03000` 5 red chasing Light LEDs on green background, need 3 seconds for run-through
