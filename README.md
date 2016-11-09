@@ -8,6 +8,9 @@ The LEDplusplus project has two main parts:
 
 We use a Arduino Nano as µC and HC-05 Bluetooth modules, to controll the ws2812(b) LED stripes.
 
+Documentation of the commands the AVR accepts can be found [here](doc/commands.md)
+
+
 ### How to build and program
 
 #### Summarized:
