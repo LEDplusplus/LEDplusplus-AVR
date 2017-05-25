@@ -227,6 +227,12 @@ void rainbow() {
   }
 }
 
+void rotate(counter) {
+  leds[counter%LENGTH].r = leds[(counter+1)%LENGTH].r;
+  leds[counter%LENGTH].g = leds[(counter+1)%LENGTH].g;
+  leds[counter%LENGTH].b = leds[(counter+1)%LENGTH].b;
+}
+
 
 int main(void) {
 	// initialize UART
@@ -253,6 +259,8 @@ int main(void) {
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
+  rainbow();
+
 	// uint8_t hardness = 0;
 
 	while (1) {
@@ -273,7 +281,7 @@ int main(void) {
 
 		}**/
 		// delay 800 µs -> loop needs ~1ms per iteration
-		_delay_us(80000);
+		_delay_us(8000);
 		//////////////////////
 		//doColorRotation(counter);
 		//////////////////////
@@ -291,7 +299,7 @@ int main(void) {
 		//}
     //chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
     ////////////////////////
-    rainbow();
+    rotate(counter);
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
