@@ -6,7 +6,7 @@
  */
 
 #ifndef LENGTH
-#define LENGTH 30
+#define LENGTH 33
 #endif
 
 #ifndef F_CPU
@@ -157,6 +157,17 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 	return next_call;
 }
 
+void chasingLights(int counter, int number, int r, int g, int b, int bg_r, int bg_g, int bg_b) {
+  doSingleColor(bg_r, bg_g, bg_b);
+  int i = 0;
+  for(i = 0; i < number; i++) {
+    leds[counter%LENGTH+i].r = r;
+    leds[counter%LENGTH+i].g = g;
+    leds[counter%LENGTH+i].b = b;
+  }
+}
+
+
 int main(void) {
 	// initialize UART
 	uart_init();
@@ -185,6 +196,7 @@ int main(void) {
 	// uint8_t hardness = 0;
 
 	while (1) {
+    /**
 		// handle UART command
 		if (uart_rcv_complete == 1) {
 			switch(command[0]) {
@@ -198,9 +210,10 @@ int main(void) {
 					doSingleColor(0, 0, 255);
 					break;
 			}
-		}
+
+		}**/
 		// delay 800 µs -> loop needs ~1ms per iteration
-		_delay_us(800);
+		_delay_us(80000);
 		//////////////////////
 		//doColorRotation(counter);
 		//////////////////////
@@ -216,6 +229,7 @@ int main(void) {
 		//if (counter == doStrobe_next_call) {
 		//	doStrobe_next_call = doStrobe(100, 300, 0, 0, 0) + counter;
 		//}
+    chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
