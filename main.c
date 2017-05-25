@@ -159,9 +159,9 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 	return next_call;
 }
 
-void chasingLights(int counter, int number, int r, int g, int b, int bg_r, int bg_g, int bg_b) {
+void chasingLights(int counter, uint8_t number, uint8_t r, uint8_t g, uint8_t b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
   doSingleColor(bg_r, bg_g, bg_b);
-  int i = 0;
+  uint8_t i = 0;
   for(i = 0; i < number; i++) {
     leds[counter%LENGTH+i].r = r;
     leds[counter%LENGTH+i].g = g;
@@ -172,7 +172,7 @@ void chasingLights(int counter, int number, int r, int g, int b, int bg_r, int b
 
 void rainbow() {
   int i;
-  int rotation;
+  uint16_t rotation;
   for( i = 0; i < LENGTH; i++) {
     rotation = (360 / LENGTH) * i;
     // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
