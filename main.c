@@ -65,6 +65,8 @@ void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g,
 	}
 }
 
+
+
 void doColorRotation(uint16_t rotation) {
 	// Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
 	uint8_t r, g, b;
@@ -168,6 +170,64 @@ void chasingLights(int counter, int number, int r, int g, int b, int bg_r, int b
 }
 
 
+void rainbow() {
+  int i;
+  int rotation;
+  for( i = 0; i < LENGTH; i++) {
+    rotation = (360 / LENGTH) * i;
+    // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
+    uint8_t r, g, b;
+    uint8_t section, section_rotation;
+    uint16_t q, t;
+    section = (rotation % 360) / 43;
+    section_rotation = (rotation % 360) % 43;
+    // p = 0;
+    q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
+    t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
+    switch (section) {
+    case 0:
+      r = 255;
+      g = t;
+      b = 0;
+      break;
+    case 1:
+      r = q;
+      g = 255;
+      b = 0;
+      break;
+    case 2:
+      r = 0;
+      g = 255;
+      b = t;
+      break;
+    case 3:
+      r = 0;
+      g = q;
+      b = 255;
+      break;
+    case 4:
+      r = t;
+      g = 0;
+      b = 255;
+      break;
+    case 5:
+      r = 255;
+      g = 0;
+      b = q;
+      break;
+    default:
+      r = 0;
+      g = 0;
+      b = 0;
+      break;
+    }
+    leds[i].r = r;
+    leds[i].g = g;
+    leds[i].b = b;
+  }
+}
+
+
 int main(void) {
 	// initialize UART
 	uart_init();
@@ -229,7 +289,9 @@ int main(void) {
 		//if (counter == doStrobe_next_call) {
 		//	doStrobe_next_call = doStrobe(100, 300, 0, 0, 0) + counter;
 		//}
-    chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
+    //chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
+    ////////////////////////
+    rainbow();
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
