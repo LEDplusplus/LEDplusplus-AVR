@@ -13,15 +13,16 @@
  #define F_CPU 16000000UL
 #endif
 
-#include <avr/io.h>
+
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include <stdlib.h>
+
 
 #include "ws2812_config.h" // override config in submodule
 #include "light_ws2812.h"
 #include "uart.h"
+#include "color.h"
 
 // LED cRGB array ws2812 library reads periodically from
 struct cRGB leds[LENGTH];
@@ -47,21 +48,21 @@ void delay_ms(int milliseconds) {
 		_delay_us(1000);
 	}
 }
-void doSingleColor(uint8_t r, uint8_t g, uint8_t b) {
+
+void doSingleColor(color_t color) {
 	for (uint8_t i = 0; i < LENGTH; i++) {
-		leds[i].r = r;
-		leds[i].g = g;
-		leds[i].b = b;
+		leds[i].r = color.r;
+		leds[i].g = color.g;
+		leds[i].b = color.b;
 	}
 }
 
 // blink adjustable duty cycle
-void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g,
-		uint8_t b, float dutycycle) {
+void doBlink(uint16_t counter, uint16_t periode, color_t color, float dutycycle) {
 	if ((counter % periode) == 0) {
-		doSingleColor(0, 0, 0);
+		doSingleColor(color_black);
 	} else if ((counter % periode) == (uint16_t) (dutycycle * periode)) {
-		doSingleColor(r, g, b);
+		doSingleColor(color);
 	}
 }
 
@@ -122,9 +123,11 @@ void doColorRotation(uint16_t rotation) {
 	}
 }
 
-void doSlowFade(uint16_t stepsPerSecond, uint8_t r, uint8_t g, uint8_t b,
-		uint8_t hardness) {
-	doSingleColor(r / 100 * hardness, g / 100 * hardness, b / 100 * hardness);
+void doSlowFade(uint16_t stepsPerSecond, color_t color, uint8_t hardness) {
+  color.r /= (100 * hardness);
+  color.g /= (100 * hardness);
+  color.b /= (100 * hardness);
+	doSingleColor(color);
 	delay_ms((int) 1000 / stepsPerSecond);
 }
 
@@ -132,22 +135,22 @@ void doSlowFade(uint16_t stepsPerSecond, uint8_t r, uint8_t g, uint8_t b,
  and predefined or random (0, 0, 0) color.
  For periodical strobe set min_time = max_time.
  Returns time in ms until doStrobe wants to be called next time. */
-int doStrobe(int min_time, int max_time, int r, int g, int b) {
+int doStrobe(int min_time, int max_time, color_t color) {
 	// time until next function call
 	int next_call;
 	// 0 = off, 1 = on
 	static int on_off = 0;
 	if (on_off == 0) {
-		// random rgb, if not defined
-		if ((r == 0) && (g == 0) && (b == 0)) {
-			r = (rand() % 255);
-			g = (rand() % 255);
-			b = (rand() % 255);
+		// random rgb, if not define
+		if ((color.r == 0) && (color.g == 0) && (color.b == 0)) {
+			color.r = (rand() % 255);
+			color.g = (rand() % 255);
+			color.b = (rand() % 255);
 		}
-		doSingleColor(r, g, b);
+		doSingleColor(color);
 		on_off = 1;
 	} else {
-		doSingleColor(0, 0, 0);
+		doSingleColor(color_black);
 		on_off = 0;
 	}
 	// if time should not be periodic -> random time on / off
@@ -159,13 +162,13 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 	return next_call;
 }
 
-void chasingLights(int counter, uint8_t number, uint8_t r, uint8_t g, uint8_t b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
-  doSingleColor(bg_r, bg_g, bg_b);
+void chasingLights(int counter, uint8_t number, color_t color, color_t color_bg) {
+  doSingleColor(color_bg);
   uint8_t i = 0;
   for(i = 0; i < number; i++) {
-    leds[counter%LENGTH+i].r = r;
-    leds[counter%LENGTH+i].g = g;
-    leds[counter%LENGTH+i].b = b;
+    leds[counter%LENGTH+i].r = color.r;
+    leds[counter%LENGTH+i].g = color.g;
+    leds[counter%LENGTH+i].b = color.b;
   }
 }
 
@@ -249,13 +252,13 @@ int main(void) {
 	uint16_t counter = 0;
 
 	// 1 second R - G - B as 'start signal'
-	doSingleColor(255, 0, 0);
+	doSingleColor(color_r);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
-	doSingleColor(0, 255, 0);
+	doSingleColor(color_g);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
-	doSingleColor(0, 0, 255);
+	doSingleColor(color_b);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
