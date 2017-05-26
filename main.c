@@ -21,8 +21,14 @@
 
 #include "ws2812_config.h" // override config in submodule
 #include "light_ws2812.h"
+
 #include "uart.h"
-#include "color.h"
+#include "utils.h"
+
+color_t color_black = {0, 0, 0};
+color_t color_red = {255, 0, 0};
+color_t color_green = {0, 255, 0};
+color_t color_blue = {0, 0, 255};
 
 // LED cRGB array ws2812 library reads periodically from
 struct cRGB leds[LENGTH];
@@ -69,57 +75,13 @@ void doBlink(uint16_t counter, uint16_t periode, color_t color, float dutycycle)
 
 
 void doColorRotation(uint16_t rotation) {
-	// Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
-	uint8_t r, g, b;
-	uint8_t section, section_rotation;
-	uint16_t q, t;
-	section = (rotation % 360) / 43;
-	section_rotation = (rotation % 360) % 43;
-	// p = 0;
-	q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
-	t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
-	switch (section) {
-	case 0:
-		r = 255;
-		g = t;
-		b = 0;
-		break;
-	case 1:
-		r = q;
-		g = 255;
-		b = 0;
-		break;
-	case 2:
-		r = 0;
-		g = 255;
-		b = t;
-		break;
-	case 3:
-		r = 0;
-		g = q;
-		b = 255;
-		break;
-	case 4:
-		r = t;
-		g = 0;
-		b = 255;
-		break;
-	case 5:
-		r = 255;
-		g = 0;
-		b = q;
-		break;
-	default:
-		r = 0;
-		g = 0;
-		b = 0;
-		break;
-	}
+
+  color_t color = colorRotation(rotation);
 
 	for (uint8_t i = 0; i < LENGTH; i++) {
-		leds[i].r = r;
-		leds[i].g = g;
-		leds[i].b = b;
+		leds[i].r = color.r;
+		leds[i].g = color.g;
+		leds[i].b = color.b;
 	}
 }
 
@@ -178,55 +140,10 @@ void rainbow() {
   uint16_t rotation;
   for( i = 0; i < LENGTH; i++) {
     rotation = (360 / LENGTH) * i;
-    // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
-    uint8_t r, g, b;
-    uint8_t section, section_rotation;
-    uint16_t q, t;
-    section = (rotation % 360) / 43;
-    section_rotation = (rotation % 360) % 43;
-    // p = 0;
-    q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
-    t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
-    switch (section) {
-    case 0:
-      r = 255;
-      g = t;
-      b = 0;
-      break;
-    case 1:
-      r = q;
-      g = 255;
-      b = 0;
-      break;
-    case 2:
-      r = 0;
-      g = 255;
-      b = t;
-      break;
-    case 3:
-      r = 0;
-      g = q;
-      b = 255;
-      break;
-    case 4:
-      r = t;
-      g = 0;
-      b = 255;
-      break;
-    case 5:
-      r = 255;
-      g = 0;
-      b = q;
-      break;
-    default:
-      r = 0;
-      g = 0;
-      b = 0;
-      break;
-    }
-    leds[i].r = r;
-    leds[i].g = g;
-    leds[i].b = b;
+    color_t color = colorRotation(rotation);
+    leds[i].r = color.r;
+    leds[i].g = color.g;
+    leds[i].b = color.b;
   }
 }
 
@@ -252,13 +169,13 @@ int main(void) {
 	uint16_t counter = 0;
 
 	// 1 second R - G - B as 'start signal'
-	doSingleColor(color_r);
+	doSingleColor(color_red);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
-	doSingleColor(color_g);
+	doSingleColor(color_green);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
-	doSingleColor(color_b);
+	doSingleColor(color_blue);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
