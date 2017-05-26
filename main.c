@@ -55,6 +55,7 @@ void delay_ms(int milliseconds) {
 	}
 }
 
+// all LEDs the same color
 void doSingleColor(color_t color) {
 	for (uint8_t i = 0; i < LENGTH; i++) {
 		leds[i].r = color.r;
@@ -72,8 +73,7 @@ void doBlink(uint16_t counter, uint16_t periode, color_t color, float dutycycle)
 	}
 }
 
-
-
+// rotate trough color space, all LEDs have the same color
 void doColorRotation(uint16_t rotation) {
 
   color_t color = colorRotation(rotation);
@@ -85,6 +85,7 @@ void doColorRotation(uint16_t rotation) {
 	}
 }
 
+// slowly fade the LEDs (all the same color) with variable steps and hardness
 void doSlowFade(uint16_t stepsPerSecond, color_t color, uint8_t hardness) {
   color.r /= (100 * hardness);
   color.g /= (100 * hardness);
@@ -124,6 +125,7 @@ int doStrobe(int min_time, int max_time, color_t color) {
 	return next_call;
 }
 
+// chasing lights, adjustable colors for chasing lights and background, variable number of chasing light LEDs
 void chasingLights(int counter, uint8_t number, color_t color, color_t color_bg) {
   doSingleColor(color_bg);
   uint8_t i = 0;
@@ -134,7 +136,7 @@ void chasingLights(int counter, uint8_t number, color_t color, color_t color_bg)
   }
 }
 
-
+// gardient through all colors, whole LED strip
 void rainbow() {
   int i;
   uint16_t rotation;
@@ -147,6 +149,7 @@ void rainbow() {
   }
 }
 
+// rotate a given pattern
 void rotate(counter) {
   leds[counter%LENGTH].r = leds[(counter+1)%LENGTH].r;
   leds[counter%LENGTH].g = leds[(counter+1)%LENGTH].g;
@@ -154,6 +157,7 @@ void rotate(counter) {
 }
 
 
+// main function, coordinats the program flow
 int main(void) {
 	// initialize UART
 	uart_init();

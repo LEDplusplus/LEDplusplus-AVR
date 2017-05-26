@@ -1,5 +1,6 @@
 #include "utils.h"
 
+// rotates trough (hsv) color space, returns a rgb color struct
 color_t colorRotation(uint16_t rotation) {
   color_t color;
   	// Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
