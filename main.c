@@ -57,14 +57,13 @@ void doSingleColor(uint8_t r, uint8_t g, uint8_t b) {
 
 // blink adjustable duty cycle
 void doBlink(uint16_t counter, uint16_t periode, uint8_t r, uint8_t g,
-		uint8_t b, float dutycycle) {
-	if ((counter % periode) == 0) {
-		doSingleColor(0, 0, 0);
+    uint8_t b, float dutycycle) {
+    if ((counter % periode) == 0) {
+        doSingleColor(0, 0, 0);
 	} else if ((counter % periode) == (uint16_t) (dutycycle * periode)) {
 		doSingleColor(r, g, b);
 	}
 }
-
 
 
 void doColorRotation(uint16_t rotation) {
@@ -159,84 +158,85 @@ int doStrobe(int min_time, int max_time, int r, int g, int b) {
 	return next_call;
 }
 
-void chasingLights(int counter, uint8_t number, uint8_t r, uint8_t g, uint8_t b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
-  doSingleColor(bg_r, bg_g, bg_b);
-  uint8_t i = 0;
-  for(i = 0; i < number; i++) {
-    leds[counter%LENGTH+i].r = r;
-    leds[counter%LENGTH+i].g = g;
-    leds[counter%LENGTH+i].b = b;
-  }
+void chasingLights(int counter, uint8_t number, uint8_t r, uint8_t g, uint8_t b,
+    uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
+    doSingleColor(bg_r, bg_g, bg_b);
+    uint8_t i = 0;
+    for(i = 0; i < number; i++) {
+        leds[counter%LENGTH+i].r = r;
+        leds[counter%LENGTH+i].g = g;
+        leds[counter%LENGTH+i].b = b;
+    }
 }
 
 
 void rainbow() {
-  int i;
-  uint16_t rotation;
-  for( i = 0; i < LENGTH; i++) {
-    rotation = (360 / LENGTH) * i;
-    // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
-    uint8_t r, g, b;
-    uint8_t section, section_rotation;
-    uint16_t q, t;
-    section = (rotation % 360) / 43;
-    section_rotation = (rotation % 360) % 43;
-    // p = 0;
-    q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
-    t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
-    switch (section) {
-    case 0:
-      r = 255;
-      g = t;
-      b = 0;
-      break;
-    case 1:
-      r = q;
-      g = 255;
-      b = 0;
-      break;
-    case 2:
-      r = 0;
-      g = 255;
-      b = t;
-      break;
-    case 3:
-      r = 0;
-      g = q;
-      b = 255;
-      break;
-    case 4:
-      r = t;
-      g = 0;
-      b = 255;
-      break;
-    case 5:
-      r = 255;
-      g = 0;
-      b = q;
-      break;
-    default:
-      r = 0;
-      g = 0;
-      b = 0;
-      break;
+    int i;
+    uint16_t rotation;
+    for( i = 0; i < LENGTH; i++) {
+        rotation = (360 / LENGTH) * i;
+        // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
+        uint8_t r, g, b;
+        uint8_t section, section_rotation;
+        uint16_t q, t;
+        section = (rotation % 360) / 43;
+        section_rotation = (rotation % 360) % 43;
+        // p = 0;
+        q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
+        t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
+        switch (section) {
+        case 0:
+            r = 255;
+            g = t;
+            b = 0;
+            break;
+        case 1:
+            r = q;
+            g = 255;
+            b = 0;
+            break;
+        case 2:
+            r = 0;
+            g = 255;
+            b = t;
+            break;
+        case 3:
+            r = 0;
+            g = q;
+            b = 255;
+            break;
+        case 4:
+            r = t;
+            g = 0;
+            b = 255;
+            break;
+        case 5:
+              r = 255;
+              g = 0;
+              b = q;
+              break;
+        default:
+              r = 0;
+              g = 0;
+              b = 0;
+              break;
+        }
+        leds[i].r = r;
+        leds[i].g = g;
+        leds[i].b = b;
     }
-    leds[i].r = r;
-    leds[i].g = g;
-    leds[i].b = b;
-  }
 }
 
 void rotate(counter) {
-  leds[counter%LENGTH].r = leds[(counter+1)%LENGTH].r;
-  leds[counter%LENGTH].g = leds[(counter+1)%LENGTH].g;
-  leds[counter%LENGTH].b = leds[(counter+1)%LENGTH].b;
+    leds[counter%LENGTH].r = leds[(counter+1)%LENGTH].r;
+    leds[counter%LENGTH].g = leds[(counter+1)%LENGTH].g;
+    leds[counter%LENGTH].b = leds[(counter+1)%LENGTH].b;
 }
 
 
 int main(void) {
 	// initialize UART
-	uart_init();
+    uart_init();
 	uint16_t doStrobe_next_call = 0;
 
 	_delay_ms(1000);
@@ -259,7 +259,7 @@ int main(void) {
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
-  rainbow();
+    rainbow();
 
 	// uint8_t hardness = 0;
 
