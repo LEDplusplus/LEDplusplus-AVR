@@ -1,3 +1,7 @@
+# Linux / Desktop Environments
+.directory
+.project
+
 # Object files
 *.o
 *.ko
