@@ -108,7 +108,7 @@ void doColorRotation(uint16_t rotation) {
 		b = q;
 		break;
 	default:
-		r = 0;
+		r = 255;
 		g = 0;
 		b = 0;
 		break;
@@ -216,7 +216,7 @@ void rainbow() {
               b = q;
               break;
         default:
-              r = 0;
+              r = 255;
               g = 0;
               b = 0;
               break;
@@ -278,7 +278,7 @@ void doRainbowRotation(uint16_t counter) {
       b = q;
       break;
     default:
-      r = 0;
+      r = 255;
       g = 0;
       b = 0;
       break;
