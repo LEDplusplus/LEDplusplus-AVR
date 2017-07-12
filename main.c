@@ -6,7 +6,7 @@
  */
 
 #ifndef LENGTH
-#define LENGTH 33
+#define LENGTH 57
 #endif
 
 #ifndef F_CPU
@@ -233,6 +233,63 @@ void rotate(counter) {
     leds[counter%LENGTH].b = leds[(counter+1)%LENGTH].b;
 }
 
+void doRainbowRotation(uint16_t counter) {
+  // Convert HSV (h = rotation, s = 255, v = 255; saturation and lightness not regarded)
+  uint8_t r, g, b;
+  uint8_t section, section_rotation;
+  uint16_t q, t;
+  uint8_t i;
+  for (i = 0; i < LENGTH; i++) {
+    uint16_t rotation = (((360 / LENGTH) * i) + counter) % 360;
+    section = (rotation % 360) / 43;
+    section_rotation = (rotation % 360) % 43;
+    // p = 0;
+    q = (255 * ((10710 - (255 * section_rotation)) / 42)) / 256;
+    t = (255 * ((10710 - (255 * (42 - section_rotation))) / 42)) / 256;
+    switch (section) {
+    case 0:
+      r = 255;
+      g = t;
+      b = 0;
+      break;
+    case 1:
+      r = q;
+      g = 255;
+      b = 0;
+      break;
+    case 2:
+      r = 0;
+      g = 255;
+      b = t;
+      break;
+    case 3:
+      r = 0;
+      g = q;
+      b = 255;
+      break;
+    case 4:
+      r = t;
+      g = 0;
+      b = 255;
+      break;
+    case 5:
+      r = 255;
+      g = 0;
+      b = q;
+      break;
+    default:
+      r = 0;
+      g = 0;
+      b = 0;
+      break;
+    }
+
+    leds[i].r = r;
+    leds[i].g = g;
+    leds[i].b = b;
+  }
+}
+
 
 int main(void) {
 	// initialize UART
@@ -299,11 +356,11 @@ int main(void) {
 		//}
     //chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
     ////////////////////////
-    rotate(counter);
+    doRainbowRotation(counter);
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
 		PORTB ^= (1 << PB5);
-		counter++;
+		counter = (counter+1) % 360;
 	}
 }
