@@ -13,6 +13,10 @@
  #define F_CPU 16000000UL
 #endif
 
+#define CMD_SINGLE_COLOR a
+#define CMD_RAINBOW p
+#define CMD_ROT_RAINBOW q
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -170,7 +174,7 @@ void chasingLights(int counter, uint8_t number, uint8_t r, uint8_t g, uint8_t b,
 }
 
 
-void rainbow() {
+void doRainbow() {
     int i;
     uint16_t rotation;
     for( i = 0; i < LENGTH; i++) {
@@ -316,29 +320,27 @@ int main(void) {
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
 
-    rainbow();
-
 	// uint8_t hardness = 0;
 
 	while (1) {
-    /**
-		// handle UART command
-		if (uart_rcv_complete == 1) {
-			switch(command[0]) {
-				case 'r':
-					doSingleColor(255, 0, 0);
-					break;
-				case 'g':
-					doSingleColor(0, 255, 0);
-					break;
-				case 'b':
-					doSingleColor(0, 0, 255);
-					break;
-			}
 
-		}**/
+		if (uart_rcv_complete == 1) {
+    PORTB ^= (1 << PB5);
+			switch(command[0]) {
+				case 'a':
+					doSingleColor(command[1], command[2], command[3]);
+					break;
+				case 'p':
+					doRainbow();
+					break;
+				case 'q':
+					doRainbowRotation(counter);
+					break;
+		  }
+    }
+
 		// delay 800 µs -> loop needs ~1ms per iteration
-		_delay_us(8000);
+		_delay_us(40000);
 		//////////////////////
 		//doColorRotation(counter);
 		//////////////////////
@@ -356,11 +358,11 @@ int main(void) {
 		//}
     //chasingLights(counter, 5, 255, 0, 0, 0, 0, 255);
     ////////////////////////
-    doRainbowRotation(counter);
+    // doRainbowRotation(counter);
 		// Refresh LED strip every loop
 		ws2812_setleds(leds, LENGTH);
 		// toggle led for debugging
-		PORTB ^= (1 << PB5);
+		// PORTB ^= (1 << PB5);
 		counter = (counter+1) % 360;
 	}
 }
