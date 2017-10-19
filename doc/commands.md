@@ -125,6 +125,27 @@ example: `g 000 000 255 00500 00250` blue strobe with 2Hz (500ms) and 50% duty c
 
 
 
+### Rainbow
+
+The colorspace is mapped on the whole LED strip
+
+command: 'h'
+
+
+
+### Rotating rainbow
+
+The colorspace is mapped on the whole LED strip and is rotating through it
+
+command: 'i'
+
+| Parameters |  period / ms   |
+|------------|----------------|
+| Type       | uint16         |
+
+
+
+
 ## commands for single LEDs
 
 ### single LEDS
