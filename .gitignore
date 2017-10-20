@@ -38,3 +38,6 @@
 *.user
 *.files
 *.includes
+
+# Linux / KDE specific
+*.directory
