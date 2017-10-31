@@ -9,6 +9,7 @@ BAUD = -b 57600
 VPATH = ..
 
 RAWSOURCES = $(wildcard ../*.c)
+RAWSOURCES += ../../light_ws2812/light_ws2812.c
 SOURCES = $(RAWSOURCES:../%=%)
 OBJECTS = $(SOURCES:.c=.o)
 

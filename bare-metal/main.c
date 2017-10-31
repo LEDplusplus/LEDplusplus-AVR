@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "ws2812_config.h" // override config in submodule
-#include "light_ws2812.h"
+#include "../light_ws2812/light_ws2812.h"
 #include "uart.h"
 
 // LED cRGB array ws2812 library reads periodically from
