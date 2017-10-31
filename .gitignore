@@ -41,3 +41,6 @@
 
 # Linux / KDE specific
 *.directory
+
+# scons
+.sconsign.dblite
