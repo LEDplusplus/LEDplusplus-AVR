@@ -319,7 +319,7 @@ int main(void) {
 	doSingleColor(0, 0, 255);
 	ws2812_setleds(leds, LENGTH);
 	_delay_ms(1000);
-
+	doRainbow();
 	// uint8_t hardness = 0;
 
 	while (1) {
